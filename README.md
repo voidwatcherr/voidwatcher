@@ -1,35 +1,29 @@
 # VoidWatcher
 
-Personal portfolio of Anshuman Singh — independent Web3 writer and researcher focused on real-world assets (RWA), tokenization, onchain finance, and community operations.
+my corner of the internet for web3 writing, rwa research, and the communities i've been part of.
 
-I turn complex onchain topics into clear, relatable writing for people exploring where traditional finance and Web3 meet.
+i mostly write about real-world assets, tokenization, and what's happening as finance moves onchain. this repo holds the site behind that work.
 
-## What you'll find here
+## what's here
 
-- **Writing:** X posts, threads, and articles on RWA and onchain finance
-- **Research:** Exploring tokenization, market activity, and emerging Web3 products
-- **Community:** Moderation, support, events, and engagement across Web3 communities
+- writing on rwa and onchain finance
+- research notes and things i'm learning along the way
+- community work, from moderation to events and support
 
-## Built with
+## built with
 
-- HTML
-- CSS
-- Vanilla JavaScript
+plain HTML, CSS, and JavaScript. no framework or build step.
 
-This is a static website with no package manager or build step required.
+## live
 
-## Live portfolio
+- portfolio: https://voidwatcher.vercel.app/
+- GitHub Pages: https://voidwatcherr.github.io/voidwatcher/
 
-- **Vercel:** https://voidwatcher.vercel.app/
-- **GitHub Pages:** https://voidwatcherr.github.io/voidwatcher/
+## files
 
-## Project structure
+- `index.html` — page content
+- `styles.css` — layout and styling
+- `script.js` — small interactions
+- `public/resources/` — site images and assets
 
-- `index.html` — page content and structure
-- `styles.css` — visual design and responsive styling
-- `script.js` — small interactive features
-- `public/resources/` — profile and other site assets
-
-## Updates
-
-The site is maintained in the `main` branch. Pushes to the connected hosting provider can trigger a new deployment.
+The site lives on `main`. Update the files, push your changes, and redeploy if the host doesn't do it automatically.
