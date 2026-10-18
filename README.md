@@ -21,9 +21,9 @@ plain HTML, CSS, and JavaScript. no framework or build step.
 
 ## files
 
-- `index.html` — page content
-- `styles.css` — layout and styling
-- `script.js` — small interactions
-- `public/resources/` — site images and assets
+- `index.html`: page content
+- `styles.css`: layout and styling
+- `script.js`: small interactions
+- `public/resources/`: site images and assets
 
 The site lives on `main`. Update the files, push your changes, and redeploy if the host doesn't do it automatically.
