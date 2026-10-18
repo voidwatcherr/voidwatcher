@@ -1,26 +1,18 @@
 # VoidWatcher
 
-Personal portfolio for Web3 writing, RWA research and community work.
+A public portfolio for Web3 writing, RWA research and community work.
 
 ## Stack
-- React
-- TypeScript
-- Vite
+
+- HTML
 - CSS
+- Vanilla JavaScript
 - GitHub Pages
 
-## Development
-Requires Node.js 20 or newer.
+## Edit the site
 
-```bash
-npm install
-npm run dev
-```
+Edit `index.html` for page content, `styles.css` for design, and `script.js` for small interactions. The site has no package manager or build step; GitHub Actions publishes the static files directly to GitHub Pages when changes are pushed to `main`.
 
-## Production build
-```bash
-npm run build
-npm run preview
-```
+## Live site
 
-The production site is generated in `dist/`. GitHub Actions builds and deploys it to GitHub Pages on pushes to `main`.
+https://voidwatcherr.github.io/voidwatcher/
