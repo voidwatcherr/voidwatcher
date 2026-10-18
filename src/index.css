@@ -43,6 +43,10 @@ button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 4px;
+}
 .site-shell {
   overflow: hidden;
   background:
@@ -1002,6 +1006,16 @@ button:disabled {
 }
 .site-footer > div a:hover {
   color: var(--teal);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 .admin-shortcut {
   position: fixed;

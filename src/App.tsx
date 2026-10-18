@@ -4,25 +4,14 @@ import {
   ArrowRight,
   BookOpen,
   BriefcaseBusiness,
-  Check,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   FileText,
-  Github,
   Globe2,
-  LoaderCircle,
-  LockKeyhole,
-  LogIn,
-  LogOut,
   Mail,
   Menu,
-  Plus,
-  ShieldCheck,
-  Trash2,
-  X,
 } from 'lucide-react';
-import { api, auth } from '@appdeploy/client';
 
 type Post = { id: string; url: string; createdAt?: string };
 declare global {
@@ -31,11 +20,6 @@ declare global {
   }
 }
 
-const OWNER_EMAIL = 'voidwatcher08@gmail.com';
-const featuredArticles: Post[] = [
-  { id: '2110900001706778888', url: 'https://x.com/voidwatchr/status/2110900001706778888?s=46' },
-  { id: '2096864187507204548', url: 'https://x.com/voidwatchr/status/2096864187507204548?s=46' },
-];
 const latestPosts: Post[] = [
   { id: '2111286480656277665', url: 'https://x.com/voidwatchr/status/2111286480656277665?s=46' },
   { id: '2110815581045989539', url: 'https://x.com/voidwatchr/status/2110815581045989539?s=46' },
@@ -50,48 +34,12 @@ const socials = {
 };
 
 function App() {
-  const [posts, setPosts] = useState<Post[]>(latestPosts);
-  const [loadingPosts, setLoadingPosts] = useState(true);
-  const [adminMode, setAdminMode] = useState(window.location.hash === '#admin');
-  const [signedIn, setSignedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [url, setUrl] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [posts] = useState<Post[]>(latestPosts);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [postIndex, setPostIndex] = useState(0);
 
-  async function loadPosts() {
-    setLoadingPosts(true);
-    try {
-      const result = await api.get('/api/posts');
-      const savedPosts: Post[] = Array.isArray(result.data.posts) ? result.data.posts : [];
-      const combined = [...latestPosts, ...savedPosts];
-      setPosts(combined.filter((post, index) => combined.findIndex(item => item.id === post.id || item.url.split('?')[0] === post.url.split('?')[0]) === index));
-    } catch {
-      setErrorMessage('Could not load posts right now.');
-    } finally {
-      setLoadingPosts(false);
-    }
-  }
-
   useEffect(() => {
-    const syncHash = () => setAdminMode(window.location.hash === '#admin');
-    window.addEventListener('hashchange', syncHash);
-    loadPosts();
-    auth
-      .getUser()
-      .then(user => {
-        setSignedIn(Boolean(user));
-        setUserEmail(user?.email ?? '');
-      })
-      .catch(() => {});
-    return () => window.removeEventListener('hashchange', syncHash);
-  }, []);
-
-  useEffect(() => {
-    if (!posts.length && !featuredArticles.length) return;
+    if (!posts.length) return;
     const existing = document.querySelector('script[data-x-embed]');
     if (!existing) {
       const script = document.createElement('script');
@@ -105,248 +53,6 @@ function App() {
       window.twttr?.widgets?.load();
     }
   }, [posts]);
-
-  function validXStatus(value: string) {
-    try {
-      const parsed = new URL(value.trim());
-      return (
-        [
-          'x.com',
-          'www.x.com',
-          'twitter.com',
-          'www.twitter.com',
-          'mobile.twitter.com',
-        ].includes(parsed.hostname.toLowerCase()) &&
-        /^\/(?:[^/]+)\/status\/\d+/.test(parsed.pathname)
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  async function signIn() {
-    setBusy(true);
-    setErrorMessage('');
-    setNotice('');
-    try {
-      const result = await auth.signIn({
-        scope: 'openid email profile offline_access',
-      });
-      setSignedIn(true);
-      setUserEmail(result.user.email ?? '');
-      if (
-        (result.user.email ?? '').toLowerCase() !== OWNER_EMAIL.toLowerCase()
-      ) {
-        setErrorMessage(
-          'This account does not have admin access. Sign out and use the portfolio owner email.'
-        );
-      } else {
-        setNotice('Signed in. You can now manage your X posts.');
-      }
-    } catch (err) {
-      const code = (err as { code?: string })?.code;
-      setErrorMessage(
-        code === 'popup_blocked'
-          ? 'Allow pop-ups for sign-in, then try again.'
-          : 'Sign-in was cancelled or failed. Please try again.'
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function savePost(event: React.FormEvent) {
-    event.preventDefault();
-    setNotice('');
-    setErrorMessage('');
-    if (!validXStatus(url)) {
-      setErrorMessage(
-        'Paste a direct X post URL, like https://x.com/username/status/123456789'
-      );
-      return;
-    }
-    setBusy(true);
-    try {
-      await api.post('/api/posts', { url: url.trim() });
-      setUrl('');
-      setNotice('Post saved to your portfolio.');
-      await loadPosts();
-    } catch {
-      setErrorMessage(
-        'Could not save this post. Confirm you are signed in with the portfolio owner email.'
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function removePost(id: string) {
-    if (!window.confirm('Remove this post from your portfolio?')) return;
-    setBusy(true);
-    setErrorMessage('');
-    setNotice('');
-    try {
-      await api.delete('/api/posts/' + encodeURIComponent(id));
-      setNotice('Post removed.');
-      await loadPosts();
-    } catch {
-      setErrorMessage(
-        'Could not remove the post. Check your admin access and try again.'
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function signOut() {
-    await auth.signOut();
-    setSignedIn(false);
-    setUserEmail('');
-    setNotice('Signed out.');
-  }
-
-  if (adminMode) {
-    const isOwner =
-      signedIn && userEmail.toLowerCase() === OWNER_EMAIL.toLowerCase();
-    return (
-      <main className="admin-page">
-        <div className="admin-top">
-          <a className="brand" href="#">
-            <span className="brand-mark">V</span>
-            <span>
-              voidwatcher<span className="brand-dot">.</span>
-            </span>
-          </a>
-          <a className="back-link" href="#">
-            <ChevronLeft size={16} /> Back to portfolio
-          </a>
-        </div>
-        <section className="admin-card">
-          <div className="eyebrow">
-            <LockKeyhole size={14} /> PRIVATE WORKSPACE
-          </div>
-          <h1>
-            Manage your <span className="gradient-text">X posts.</span>
-          </h1>
-          <p className="admin-intro">
-            Paste a public X post URL to add the original embed to your
-            portfolio. Your saved posts stay here when you refresh.
-          </p>
-          {!isOwner ? (
-            <div className="signin-box">
-              <div className="signin-icon">
-                <ShieldCheck size={22} />
-              </div>
-              <h2>Owner sign-in required</h2>
-              <p>
-                Sign in with the email connected to this portfolio. Only the
-                owner can add or remove posts.
-              </p>
-              {signedIn &&
-                userEmail.toLowerCase() !== OWNER_EMAIL.toLowerCase() && (
-                  <p className="alert error">
-                    Signed in as {userEmail || 'another account'}, which does
-                    not have admin access.
-                  </p>
-                )}
-              <button className="primary-btn" onClick={signIn} disabled={busy}>
-                <LogIn size={16} />
-                {busy ? 'Connecting…' : 'Sign in to manage posts'}
-              </button>
-            </div>
-          ) : (
-            <form className="post-form" onSubmit={savePost}>
-              <label htmlFor="post-url">X post URL</label>
-              <div className="url-row">
-                <input
-                  id="post-url"
-                  type="url"
-                  value={url}
-                  onChange={e => setUrl(e.target.value)}
-                  placeholder="https://x.com/username/status/…"
-                  autoComplete="url"
-                  required
-                />
-                <button
-                  className="primary-btn"
-                  type="submit"
-                  disabled={busy || !url.trim()}
-                >
-                  {busy ? (
-                    <LoaderCircle className="spin" size={16} />
-                  ) : (
-                    <Plus size={16} />
-                  )}{' '}
-                  Save post
-                </button>
-              </div>
-              <p className="field-hint">
-                Use a direct post link, not a profile or search URL. X controls
-                whether each post can be embedded.
-              </p>
-            </form>
-          )}
-          {notice && (
-            <p className="alert success">
-              <Check size={15} />
-              {notice}
-            </p>
-          )}
-          {errorMessage && <p className="alert error">{errorMessage}</p>}
-          <div className="admin-list-head">
-            <div>
-              <span className="eyebrow">YOUR COLLECTION</span>
-              <h2>
-                Saved posts <span className="count">{posts.length}</span>
-              </h2>
-            </div>
-            {isOwner && (
-              <button className="text-btn" onClick={signOut}>
-                <LogOut size={15} /> Sign out
-              </button>
-            )}
-          </div>
-          {loadingPosts ? (
-            <p className="muted">
-              <LoaderCircle className="spin" size={16} /> Loading posts…
-            </p>
-          ) : posts.length ? (
-            <div className="admin-post-list">
-              {posts.map(post => (
-                <div className="admin-post" key={post.id}>
-                  <div className="x-badge">𝕏</div>
-                  <div className="admin-post-url">
-                    <strong>X post</strong>
-                    <a href={post.url} target="_blank" rel="noreferrer">
-                      {post.url}
-                    </a>
-                  </div>
-                  {isOwner && (
-                    <button
-                      className="icon-btn danger"
-                      onClick={() => removePost(post.id)}
-                      aria-label="Remove post"
-                    >
-                      <Trash2 size={17} />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <FileText size={24} />
-              <strong>No posts saved yet</strong>
-              <span>Add your first X post above.</span>
-            </div>
-          )}
-          <p className="admin-foot">
-            Posts are public embeds. Do not add private or deleted content.
-          </p>
-        </section>
-      </main>
-    );
-  }
 
   return (
     <div className="site-shell">
@@ -394,7 +100,7 @@ function App() {
               Web3, finance<br />and the people building it.
             </h1>
             <p className="hero-description">
-              i’m anshuman. i write about projects i’m researching, with a focus on real-world assets and how they’re being used onchain. i also work on community and content for web3 teams.
+              I’m Anshuman — a Web3 researcher and community operator focused on real-world assets, onchain finance, and the people building the next generation of financial products.
             </p>
             <div className="hero-actions">
               <a className="primary-btn" href="#work">
@@ -500,7 +206,7 @@ function App() {
           </div>
           <div className="experience-list">
             <article className="experience-item">
-              <div className="exp-date">2024 — PRESENT</div>
+              <div className="exp-date">2023 — PRESENT</div>
               <div className="exp-main">
                 <div className="exp-title-row">
                   <h3>Web3 Content & Research</h3>
@@ -584,7 +290,7 @@ function App() {
             <span>COMMUNITY MEMBERS SUPPORTED</span>
           </div>
           <div>
-            <strong>2024</strong>
+            <strong>2023</strong>
             <span>STARTED CREATING WEB3 CONTENT</span>
           </div>
           <div>
@@ -768,11 +474,7 @@ function App() {
               Follow on X <ArrowUpRight size={15} />
             </a>
           </div>
-          {loadingPosts ? (
-            <div className="posts-empty">
-              <LoaderCircle className="spin" size={20} /> Loading posts…
-            </div>
-          ) : posts.length ? (
+          {posts.length ? (
             <>
               <div className="post-rail-controls">
                 <span>
@@ -891,13 +593,6 @@ function App() {
           </a>
         </div>
       </footer>
-      <a
-        className="admin-shortcut"
-        href="#admin"
-        aria-label="Open portfolio admin"
-      >
-        <LockKeyhole size={13} />
-      </a>
     </div>
   );
 }
