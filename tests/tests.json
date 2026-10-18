@@ -1,0 +1,53 @@
+[
+  {
+    "name": "Browse portfolio and embedded work",
+    "sanity": true,
+    "viewport": "desktop",
+    "covers": [
+      "resume content rendering",
+      "public X post listing",
+      "portfolio navigation"
+    ],
+    "description": "Verifies the portfolio presents the resume sections and loads the public work rail.",
+    "steps": [
+      "Open the portfolio home page",
+      "Review experience and selected work",
+      "Scroll to the X posts section"
+    ],
+    "expected": "The portfolio shows the resume-based profile, experience, selected work, and an X posts section without requiring sign-in."
+  },
+  {
+    "name": "Save an X post as admin",
+    "viewport": "desktop",
+    "covers": [
+      "admin authentication",
+      "X URL validation",
+      "persistent post creation",
+      "official X embed rendering"
+    ],
+    "description": "Verifies an authorized admin can save a valid X status URL and see it appear in the public work rail.",
+    "steps": [
+      "Open the admin route",
+      "Sign in with the portfolio owner's email",
+      "Paste a valid X status URL and save it",
+      "Return to the portfolio and refresh"
+    ],
+    "expected": "The saved post remains in the public post rail after refresh and renders as an official X embed."
+  },
+  {
+    "name": "Reject invalid post URL on mobile",
+    "viewport": "mobile",
+    "covers": [
+      "mobile admin layout",
+      "invalid X URL guardrail",
+      "visible validation feedback"
+    ],
+    "description": "Verifies the admin form works on mobile and refuses non-X URLs.",
+    "steps": [
+      "Open the admin route on mobile",
+      "Sign in with the portfolio owner's email",
+      "Paste a non-X URL and attempt to save"
+    ],
+    "expected": "A clear validation message appears and no invalid URL is added to the public post rail."
+  }
+]
